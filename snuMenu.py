@@ -1,3 +1,4 @@
+import re
 import requests
 from bs4 import BeautifulSoup
 
@@ -46,6 +47,10 @@ class snuMenu():
             "예술계식당":4, "공대간이식당":5, "상아회관":6, "220동식당":7
             }
 
+    map_price = {   # 가격 매핑
+            'ⓐ':"2500원", 'ⓑ':"3000원", 'ⓒ':"3500원",
+            'ⓓ':"4000원", 'ⓔ':"4500원", 'ⓕ':"5000원", 'ⓖ':" 기타"}
+
     def __init__(self, string):
         # instance에 고유한 변수들을 생성한다
         self.name = None        # [식당명]
@@ -58,7 +63,6 @@ class snuMenu():
         
         if length != 1 and length != 2:
             self.belong = 3
-            print("잘못된 명령어")
             return
 
         
@@ -77,8 +81,8 @@ class snuMenu():
             if token[1] == "아침" or token[1] == "점심" or token[1] == "저녁":
                 self.time = token[1]
 
-        output = str(self.name) + "의 [" + str(self.time) + "] 메뉴를 출력합니다."
-        print(output)
+        snuMenu.update(self.belong)
+
 
     def update(num):
         # 식단 정보 업데이트
@@ -94,20 +98,43 @@ class snuMenu():
         # 해당 식당의 아침, 점심, 저녁 메뉴를 읽어들인다
         if self.belong == 3:
             # 잘못된 명령어
-            print("쨘")
             return "잘못된 식당 이름입니다"
         
-        result = ""
+        result = '<'+ self.name + '> '
         index = snuMenu.map_index[self.name]
         soup_all = snuMenu.map_soup[self.belong][index]
         soup = soup_all.find_all("td")
-        # print(soup[4])
         if self.time == "아침":
-            result += soup[2].text
+            result += "아침: " + snuMenu.prettify(soup[2].text)
         elif self.time == "점심":
-            result += soup[4].text
+            result += "점심: " + snuMenu.prettify(soup[4].text)
         elif self.time == "저녁":
-            result += soup[6].text
+            result += "저녁: " + snuMenu.prettify(soup[6].text)
         else:
-            result += "아침: " + soup[2].text + " 점심:" + soup[4].text + " 저녁:" + soup[6].text
+            result += ( "아침: " + snuMenu.prettify(soup[2].text)  
+                        + "\n점심: " + snuMenu.prettify(soup[4].text) 
+                        + "\n저녁: " + snuMenu.prettify(soup[6].text)
+                        )
+            
         return result
+
+    def prettify(string):
+        # 가격 정보를 넣어준다 ex. 치킨텐더(3000원)
+        # 채식 정보도 같이 넣어준다 ex. 연두부비빔밥[채식](3500원)
+        # 아무 정보 없는 경우를 처리한다 ex. 없음
+    
+        string = string.strip()
+        if not string:
+            return "없음"
+
+        parsed = re.split(" |\n|/", string)   # space와 개행문자로 split한다
+        
+        output_list = list(map( 
+                        (lambda s: 
+                            s[1:].replace("(*)", "[채식]")+'('+snuMenu.map_price[s[0]]+')'),
+                        parsed)
+                        ) 
+        output = ""
+        for o in output_list:
+            output += o + " "
+        return output

@@ -4,5 +4,5 @@ l = [snuMenu("감골"), snuMenu("긱식 뙇뙇"), snuMenu("학관 점심"), snuM
 snuMenu.update(1)
 snuMenu.update(2)
 for a in l:
-    if a.belong != 3: print(a.name + ": " + a.getMenu())
+    print(a.getMenu())
 
