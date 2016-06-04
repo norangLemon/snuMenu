@@ -5,8 +5,8 @@ from bs4 import BeautifulSoup
 """
 서울대학교 생협의 메뉴를 읽어오는 코드
 """
-addr1 = "https://www.snuco.com/html/restaurant/restaurant_menu1.asp" # 직영식당
-addr2 = "https://www.snuco.com/html/restaurant/restaurant_menu2.asp" # 위탁식당
+addr1 = "http://www.snuco.com/html/restaurant/restaurant_menu1.asp" # 직영식당
+addr2 = "http://www.snuco.com/html/restaurant/restaurant_menu2.asp" # 위탁식당
 
 
 
@@ -33,12 +33,16 @@ class snuMenu():
 
     soup1 = None
     soup2 = None
-    map_req = {     # 식당 소속에 따른 크롤링 매핑
-            1:requests.get(addr1, verify=False), 2:requests.get(addr2, verify=False), 3:None
-            }
-    map_soup = {    # 식당 소속에 따른 코드 추출 결과 매핑
-            1:soup1, 2:soup2
-            }
+
+    # 식당 소속에 따른 크롤링 매핑
+    session = requests.Session()
+    map_req = {
+        1: session.get(addr1),
+        2: session.get(addr2),
+        3: None
+    }
+
+    map_soup = { 1: soup1, 2: soup2 } # 식당 소속에 따른 코드 추출 결과 매핑
     map_index = {  # 직영식당의 식당명에 따른 번호 매핑
             "학생회관식당":1, "제3식당":2, "기숙사식당":3, "자하연식당":4, 
             "302동식당":5, "솔밭간이식당":6, "동원관식당":7, "감골식당":8,
