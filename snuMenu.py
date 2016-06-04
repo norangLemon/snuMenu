@@ -32,13 +32,19 @@ class snuMenu():
 
     soup1 = None
     soup2 = None
-    map_req={ # 식당 소속에 따른 크롤링 매핑
+    map_req = {     # 식당 소속에 따른 크롤링 매핑
             1:requests.get(addr1, verify=False), 2:requests.get(addr2, verify=False), 3:None
             }
-    map_soup={ # 식당 소속에 따른 코드 추출 결과 매핑
+    map_soup = {    # 식당 소속에 따른 코드 추출 결과 매핑
             1:soup1, 2:soup2
             }
-
+    map_index = {  # 직영식당의 식당명에 따른 번호 매핑
+            "학생회관식당":1, "제3식당":2, "기숙사식당":3, "자하연식당":4, 
+            "302동식당":5, "솔밭간이식당":6, "동원관식당":7, "감골식당":8,
+                    # 위탁식당의 식당명에 따른 번호 매핑
+            "서당골":1, "두레미담":2, "301동식당":3,
+            "예술계식당":4, "공대간이식당":5, "상아회관":6, "220동식당":7
+            }
 
     def __init__(self, string):
         # instance에 고유한 변수들을 생성한다
@@ -51,6 +57,7 @@ class snuMenu():
         length = len(token)
         
         if length != 1 and length != 2:
+            self.belong = 3
             print("잘못된 명령어")
             return
 
@@ -61,25 +68,46 @@ class snuMenu():
             self.name = snuMenu.map2.get(token[0], None)
             self.belong = 2          # 위탁식당 소속
         if not self.name:
+            self.name = token[0]
             self.belong = 3          # 잘못된 식당명
    
         if length == 2:
             # 인자가 두개 들어온 경우 [아침/점심/저녁] 인지 확인한다
             # 올바르지 않은 경우, None으로 두고 아침/점심/저녁 메뉴를 모두 출력하게 한다
             if token[1] == "아침" or token[1] == "점심" or token[1] == "저녁":
-                time = token[1]
+                self.time = token[1]
 
         output = str(self.name) + "의 [" + str(self.time) + "] 메뉴를 출력합니다."
         print(output)
 
-    def update(self):
+    def update(num):
         # 식단 정보 업데이트
-        req = snuMenu.map_req[self.belong]
+        req = snuMenu.map_req[num]
         req.encoding = "euc-kr"
         s_raw = BeautifulSoup(req.text, "html.parser")
         s_raw = s_raw.find_all('tbody')
-        soup = s_raw[3].find_all('tr')
-        print(soup)
-        snuMenu.map_soup[self.belong] = soup
+        soup = s_raw[3].find_all("tr")
+        snuMenu.map_soup[num] = soup
 
 
+    def getMenu(self):
+        # 해당 식당의 아침, 점심, 저녁 메뉴를 읽어들인다
+        if self.belong == 3:
+            # 잘못된 명령어
+            print("쨘")
+            return "잘못된 식당 이름입니다"
+        
+        result = ""
+        index = snuMenu.map_index[self.name]
+        soup_all = snuMenu.map_soup[self.belong][index]
+        soup = soup_all.find_all("td")
+        # print(soup[4])
+        if self.time == "아침":
+            result += soup[2].text
+        elif self.time == "점심":
+            result += soup[4].text
+        elif self.time == "저녁":
+            result += soup[6].text
+        else:
+            result += "아침: " + soup[2].text + " 점심:" + soup[4].text + " 저녁:" + soup[6].text
+        return result

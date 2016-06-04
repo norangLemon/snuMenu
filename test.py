@@ -1,7 +1,8 @@
 from snuMenu import snuMenu
 
-a = snuMenu("감골")
-snuMenu("긱식 뙇뙇")
-c = snuMenu("301 저녁")
-c.update()
-snuMenu("asdfj afs af")
+l = [snuMenu("감골"), snuMenu("긱식 뙇뙇"), snuMenu("학관 점심"), snuMenu("asdfj afs af"), snuMenu("301 저녁")]
+snuMenu.update(1)
+snuMenu.update(2)
+for a in l:
+    if a.belong != 3: print(a.name + ": " + a.getMenu())
+
