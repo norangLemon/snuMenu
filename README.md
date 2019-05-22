@@ -1,5 +1,6 @@
 서울대 식단 크롤링
-=====
+---
+*used in: [snuBot](https://github.com/norangLemon/snuBot)*
 
 ### Library
 * [requests 2.10.0](http://docs.python-requests.org/en/master/): HTTP library for Python
