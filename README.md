@@ -1,4 +1,4 @@
-서울대 식단 크롤링
+서울대 식단 크롤링 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ---
 *used in: [snuBot](https://github.com/norangLemon/snuBot)*
 
